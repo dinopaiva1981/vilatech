@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Módulo 02 · Operação Criativa — Villa Tech Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f1ece1;
+    --ink: #0d0d0d;
+    --neon: #7dff9c;
+    --amarelo: #f5c842;
+    --tomate: #e8834a;
+    --line: 3px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--ink); font-family: 'Space Grotesk', sans-serif; overflow-x: hidden; cursor: none; }
+  ::selection { background: var(--neon); color: var(--ink); }
+
+  .cursor { position: fixed; width: 16px; height: 16px; background: var(--ink); border-radius: 50%; pointer-events: none; z-index: 9999; mix-blend-mode: difference; transform: translate(-50%, -50%); transition: width .2s, height .2s; }
+  .cursor.big { width: 60px; height: 60px; background: var(--neon); mix-blend-mode: normal; }
+  @media (hover: none) { .cursor { display: none; } body { cursor: auto; } }
+
+  .ticker { position: fixed; top: 0; left: 0; right: 0; background: var(--ink); color: var(--bg); border-bottom: var(--line) solid var(--ink); z-index: 100; overflow: hidden; height: 40px; display: flex; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; }
+  .ticker-track { display: flex; gap: 60px; white-space: nowrap; animation: tick 40s linear infinite; padding-left: 60px; }
+  .ticker-track b { color: var(--neon); }
+  @keyframes tick { to { transform: translateX(-50%); } }
+
+  .nav { position: fixed; top: 40px; left: 0; right: 0; z-index: 99; display: flex; justify-content: space-between; align-items: center; padding: 18px 32px; background: var(--bg); border-bottom: var(--line) solid var(--ink); transition: transform .3s; }
+  .nav.hide { transform: translateY(-100%); }
+  .nav-logo { font-family: 'Instrument Serif', serif; font-size: 24px; font-style: italic; letter-spacing: -.5px; text-decoration: none; color: var(--ink); }
+  .nav-logo b { font-style: normal; font-family: 'Space Grotesk', sans-serif; font-weight: 700; letter-spacing: -1px; }
+  .nav-back { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; color: var(--ink); padding: 8px 14px; border: 2px solid var(--ink); transition: all .15s; }
+  .nav-back:hover { background: var(--neon); }
+
+  /* HERO MODULE — flip palette: dark hero */
+  .hero {
+    min-height: 100vh;
+    padding: 120px 32px 60px;
+    border-bottom: var(--line) solid var(--ink);
+    position: relative;
+    overflow: hidden;
+    background: var(--ink);
+    color: var(--bg);
+    display: grid;
+    align-content: center;
+  }
+  .hero .num-badge { font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 24px; display: flex; align-items: center; gap: 16px; }
+  .hero .num-badge .pill { background: var(--neon); color: var(--ink); padding: 6px 12px; }
+  .hero .num-badge .dot { width: 10px; height: 10px; background: var(--tomate); border-radius: 50%; animation: pulse 1.4s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: .3; transform: scale(.7); } }
+
+  .hero h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 500;
+    font-size: clamp(50px, 10vw, 180px);
+    line-height: .9;
+    letter-spacing: -.04em;
+    max-width: 1380px;
+  }
+  .hero h1 .it { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; }
+  .hero h1 .hl { background: var(--neon); color: var(--ink); padding: 0 .08em; box-decoration-break: clone; }
+
+  .hero-sub-grid { margin-top: 56px; display: grid; grid-template-columns: 1.4fr 1fr; gap: 60px; align-items: end; }
+  @media (max-width: 760px) { .hero-sub-grid { grid-template-columns: 1fr; gap: 32px; } }
+
+  .hero-sub-grid p { font-size: clamp(16px, 1.4vw, 20px); line-height: 1.55; max-width: 580px; opacity: .85; }
+
+  .hero-meta { display: grid; grid-template-columns: repeat(3, 1fr); border: 2px solid var(--bg); }
+  .hero-meta div { padding: 18px 16px; border-right: 2px solid var(--bg); }
+  .hero-meta div:last-child { border-right: 0; }
+  .hero-meta div b { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 30px; letter-spacing: -1px; line-height: 1; display: block; color: var(--neon); }
+  .hero-meta div span { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; margin-top: 6px; display: block; opacity: .55; }
+
+  .float-art { position: absolute; pointer-events: none; will-change: transform; }
+  .float-art svg { display: block; width: 100%; height: 100%; overflow: visible; }
+  .float-art svg * { fill: none; stroke: var(--bg); stroke-width: 2; }
+
+  /* MARQUEE */
+  .marquee { background: var(--neon); color: var(--ink); padding: 22px 0; overflow: hidden; border-bottom: var(--line) solid var(--ink); }
+  .marquee-track { display: flex; gap: 60px; white-space: nowrap; animation: tick 28s linear infinite; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: clamp(36px, 6vw, 80px); letter-spacing: -.04em; line-height: 1; }
+  .marquee-track .it { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; }
+
+  /* TOC */
+  .toc { padding: 80px 32px; border-bottom: var(--line) solid var(--ink); }
+  .toc h2 { font-family: 'Space Grotesk', sans-serif; font-weight: 500; font-size: clamp(32px, 5vw, 60px); letter-spacing: -.03em; margin-bottom: 32px; line-height: 1; }
+  .toc h2 .it { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; }
+  .toc-list { border-top: var(--line) solid var(--ink); }
+  .toc-item { display: grid; grid-template-columns: 80px 1fr auto auto; gap: 24px; padding: 22px 0; border-bottom: 2px solid var(--ink); align-items: center; text-decoration: none; color: var(--ink); transition: padding .2s, background .2s; }
+  .toc-item:hover { background: var(--neon); padding-left: 14px; padding-right: 14px; }
+  .toc-item .i-num { font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 2px; }
+  .toc-item .i-title { font-family: 'Space Grotesk', sans-serif; font-weight: 500; font-size: clamp(22px, 2.6vw, 36px); letter-spacing: -.02em; }
+  .toc-item .i-title .it { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; }
+  .toc-item .i-time { font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; opacity: .65; }
+  .toc-item .i-arrow { font-size: 28px; transition: transform .3s; }
+  .toc-item:hover .i-arrow { transform: translateX(8px); }
+
+  .block { padding: 120px 32px; border-bottom: var(--line) solid var(--ink); position: relative; overflow: hidden; }
+  .block:nth-child(even) { background: var(--ink); color: var(--bg); }
+  .block:nth-child(even) .b-card { background: rgba(241,236,225,.05); border-color: rgba(241,236,225,.2); }
+  .block:nth-child(even) .b-card.acc { background: var(--neon); color: var(--ink); border-color: var(--ink); }
+  .block:nth-child(even) .b-card.amb { background: var(--amarelo); color: var(--ink); border-color: var(--ink); }
+  .block:nth-child(even) .b-card.tom { background: var(--tomate); color: var(--ink); border-color: var(--ink); }
+  .block:nth-child(even) .b-num-huge { color: rgba(241,236,225,.06); }
+
+  .b-num-huge {
+    position: absolute;
+    top: 60px; right: -20px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: clamp(220px, 36vw, 540px);
+    line-height: .8;
+    letter-spacing: -.06em;
+    color: rgba(13,13,13,.045);
+    pointer-events: none;
+    will-change: transform;
+    user-select: none;
+  }
+
+  .b-head { display: grid; grid-template-columns: 1fr 2fr; gap: 60px; margin-bottom: 60px; position: relative; z-index: 2; }
+  @media (max-width: 880px) { .b-head { grid-template-columns: 1fr; gap: 24px; } }
+
+  .b-head .b-meta { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; border-top: 2px solid currentColor; padding-top: 14px; }
+  .b-head .b-meta .b-num { display: block; font-family: 'Space Grotesk', sans-serif; font-weight: 500; font-size: 64px; letter-spacing: -2px; line-height: 1; margin-top: 8px; }
+  .b-head .b-meta .b-time { display: inline-block; margin-top: 24px; padding: 6px 12px; background: var(--neon); color: var(--ink); border: 2px solid var(--ink); font-size: 11px; }
+
+  .b-head h2 { font-family: 'Space Grotesk', sans-serif; font-weight: 500; font-size: clamp(36px, 5vw, 80px); line-height: .95; letter-spacing: -.04em; margin-bottom: 20px; }
+  .b-head h2 .it { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; }
+  .b-head h2 .hl { background: var(--neon); color: var(--ink); padding: 0 .08em; box-decoration-break: clone; }
+  .b-head .b-desc { font-size: 17px; line-height: 1.55; max-width: 600px; opacity: .8; }
+
+  .b-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; position: relative; z-index: 2; }
+  @media (max-width: 880px) { .b-grid { grid-template-columns: 1fr; } }
+
+  .b-card { border: 2px solid var(--ink); padding: 28px; background: rgba(13,13,13,.03); }
+  .b-card.full { grid-column: 1 / -1; }
+  .b-card.acc { border-color: var(--ink); background: var(--neon); }
+  .b-card.amb { border-color: var(--ink); background: var(--amarelo); }
+  .b-card.tom { border-color: var(--ink); background: var(--tomate); color: var(--ink); }
+
+  .b-card .lbl { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+  .b-card .lbl::before { content: ''; width: 22px; height: 2px; background: currentColor; }
+
+  .b-card h3 { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; font-size: 28px; line-height: 1.05; margin-bottom: 14px; letter-spacing: -.5px; }
+  .b-card .activity-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 22px; letter-spacing: -.5px; margin-bottom: 14px; line-height: 1.05; }
+  .b-card p { font-size: 14px; line-height: 1.6; margin-bottom: 12px; }
+  .b-card p b { font-weight: 700; }
+
+  ul.dots { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  ul.dots li { font-size: 15px; line-height: 1.55; padding-left: 22px; position: relative; }
+  ul.dots li::before { content: '→'; position: absolute; left: 0; top: 0; font-weight: 600; }
+  ul.dots li b { font-weight: 600; }
+
+  .b-quote { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; font-size: clamp(20px, 2.4vw, 30px); line-height: 1.3; padding: 24px 0 24px 28px; border-left: 3px solid var(--ink); margin-top: 24px; max-width: 800px; }
+
+  /* The 5 sintomas grid */
+  .symptoms { display: grid; grid-template-columns: repeat(5, 1fr); margin-top: 24px; border: 2px solid var(--ink); }
+  @media (max-width: 880px) { .symptoms { grid-template-columns: 1fr 1fr; } }
+  .symptom { padding: 20px 16px; border-right: 2px solid var(--ink); border-bottom: 2px solid var(--ink); }
+  .symptom:last-child { border-right: 0; }
+  .symptom .n { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 1.5px; opacity: .55; }
+  .symptom .l { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 16px; letter-spacing: -.4px; margin-top: 8px; line-height: 1.15; }
+  .symptom .l .it { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; }
+
+  /* 90 days plan */
+  .ninety {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin-top: 32px;
+    border: 2px solid var(--ink);
+  }
+  @media (max-width: 760px) { .ninety { grid-template-columns: 1fr; } }
+  .ninety-step { padding: 28px; border-right: 2px solid var(--ink); position: relative; }
+  .ninety-step:last-child { border-right: 0; }
+  .ninety-step .month { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; opacity: .55; }
+  .ninety-step h4 { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 28px; letter-spacing: -.5px; margin: 8px 0 12px; }
+  .ninety-step h4 .it { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; }
+  .ninety-step p { font-size: 14px; line-height: 1.5; opacity: .8; }
+
+  /* CTA */
+  .next-cta { padding: 120px 32px; background: var(--neon); border-bottom: var(--line) solid var(--ink); }
+  .next-cta h2 { font-family: 'Space Grotesk', sans-serif; font-weight: 500; font-size: clamp(48px, 9vw, 140px); line-height: .9; letter-spacing: -.05em; margin-bottom: 40px; }
+  .next-cta h2 .it { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; }
+  .next-cta .btn-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 32px; }
+  .btn { display: inline-flex; align-items: center; gap: 14px; background: var(--ink); color: var(--bg); padding: 22px 28px; text-decoration: none; font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; border: var(--line) solid var(--ink); transition: all .15s; }
+  .btn:hover { background: var(--bg); color: var(--ink); }
+  .btn.outline { background: transparent; color: var(--ink); }
+  .btn.outline:hover { background: var(--ink); color: var(--bg); }
+  .next-cta .small { font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; max-width: 520px; line-height: 1.6; }
+
+  footer { background: var(--ink); color: var(--bg); padding: 48px 32px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; }
+  footer a { color: var(--neon); text-decoration: none; }
+
+  .reveal { opacity: 0; transform: translateY(40px); transition: opacity .9s ease, transform .9s cubic-bezier(.2,.8,.2,1); }
+  .reveal.in { opacity: 1; transform: none; }
+  .parallax { will-change: transform; }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+
+<div class="ticker">
+  <div class="ticker-track">
+    <span><b>●</b> Módulo 02 · Gestores e executivos</span>
+    <span>8h · 7 blocos</span>
+    <span><b>●</b> Operação criativa que gera resultado</span>
+    <span>Greencave × Villa Tech</span>
+    <span><b>●</b> Módulo 02 · Gestores e executivos</span>
+    <span>8h · 7 blocos</span>
+    <span><b>●</b> Operação criativa que gera resultado</span>
+    <span>Greencave × Villa Tech</span>
+  </div>
+</div>
+
+<nav class="nav" id="nav">
+  <a href="index.html" class="nav-logo"><b>Greencave</b> <i>×</i> Villa Tech</a>
+  <a href="index.html" class="nav-back">← Voltar ao hub</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="num-badge">
+    <span class="pill">Módulo 02 / 02</span>
+    <span class="dot"></span>
+    8 horas · gestores · executivos · diagnóstico + plano
+  </div>
+  <h1>
+    Como estruturar uma <span class="it">operação criativa</span> que <span class="hl">gera&nbsp;resultado</span>.
+  </h1>
+
+  <div class="hero-sub-grid">
+    <p>
+      A dor das médias empresas do interior é específica: <em>produto bom, comunicação fraca</em>, sem saber por onde começar.
+      Esse módulo é diagnóstico, estratégia e plano de ação — com a Greencave como prova viva de que dá pra fazer diferente.
+    </p>
+    <div class="hero-meta">
+      <div><b>8h</b><span>Conteúdo</span></div>
+      <div><b>07</b><span>Blocos</span></div>
+      <div><b>05</b><span>Exercícios</span></div>
+    </div>
+  </div>
+
+  <div class="float-art parallax" style="top: 18%; right: 6%; width: 220px; height: 220px;" data-speed="0.18">
+    <svg viewBox="0 0 220 220">
+      <rect x="20" y="20" width="180" height="180"/>
+      <rect x="50" y="50" width="120" height="120"/>
+      <rect x="80" y="80" width="60" height="60"/>
+      <line x1="20" y1="20" x2="200" y2="200"/>
+      <line x1="200" y1="20" x2="20" y2="200"/>
+    </svg>
+  </div>
+  <div class="float-art parallax" style="bottom: 14%; right: 32%; width: 100px; height: 100px;" data-speed="-0.25">
+    <svg viewBox="0 0 100 100">
+      <polygon points="50,5 95,50 50,95 5,50"/>
+      <circle cx="50" cy="50" r="14"/>
+    </svg>
+  </div>
+</section>
+
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    <span>Diagnosticar <span class="it">·&nbsp;&nbsp;</span> Decidir <span class="it">·&nbsp;&nbsp;</span> Estruturar <span class="it">·&nbsp;&nbsp;</span> Operar <span class="it">·&nbsp;&nbsp;</span> Posicionar <span class="it">·&nbsp;&nbsp;</span></span>
+    <span>Diagnosticar <span class="it">·&nbsp;&nbsp;</span> Decidir <span class="it">·&nbsp;&nbsp;</span> Estruturar <span class="it">·&nbsp;&nbsp;</span> Operar <span class="it">·&nbsp;&nbsp;</span> Posicionar <span class="it">·&nbsp;&nbsp;</span></span>
+  </div>
+</div>
+
+<!-- TOC -->
+<section class="toc">
+  <h2 class="reveal">Sete blocos<span class="it">,</span> oito horas<span class="it">,</span> uma decisão.</h2>
+  <div class="toc-list">
+    <a href="#b1" class="toc-item reveal"><div class="i-num">01</div><div class="i-title">Por que sua marca <span class="it">está perdida</span></div><div class="i-time">60 min</div><div class="i-arrow">→</div></a>
+    <a href="#b2" class="toc-item reveal"><div class="i-num">02</div><div class="i-title">O que é uma <span class="it">área criativa funcional</span></div><div class="i-time">90 min</div><div class="i-arrow">→</div></a>
+    <a href="#b3" class="toc-item reveal"><div class="i-num">03</div><div class="i-title">Time interno <span class="it">vs.</span> hub criativo</div><div class="i-time">60 min</div><div class="i-arrow">→</div></a>
+    <a href="#b4" class="toc-item reveal"><div class="i-num">04</div><div class="i-title">Briefing <span class="it">e gestão do criativo</span></div><div class="i-time">90 min</div><div class="i-arrow">→</div></a>
+    <a href="#b5" class="toc-item reveal"><div class="i-num">05</div><div class="i-title">Greencave como <span class="it">case aplicado</span></div><div class="i-time">60 min</div><div class="i-arrow">→</div></a>
+    <a href="#b6" class="toc-item reveal"><div class="i-num">06</div><div class="i-title">Posicionamento <span class="it">para médias empresas</span></div><div class="i-time">60 min</div><div class="i-arrow">→</div></a>
+    <a href="#b7" class="toc-item reveal"><div class="i-num">07</div><div class="i-title">O que eu faço <span class="it">segunda-feira?</span></div><div class="i-time">60 min</div><div class="i-arrow">→</div></a>
+  </div>
+</section>
+
+<!-- BLOCK 1 -->
+<section class="block" id="b1">
+  <div class="b-num-huge parallax" data-speed="0.05">01</div>
+  <div class="b-head">
+    <div class="b-meta">Bloco<span class="b-num">01</span><span class="b-time">60 min</span></div>
+    <div>
+      <h2 class="reveal">Por que sua marca <span class="hl">está perdida</span><span class="it">.</span></h2>
+      <p class="b-desc reveal">Diagnóstico honesto e sem rodeios. Os sintomas e o custo real — financeiro e de reputação — de uma comunicação inconsistente.</p>
+    </div>
+  </div>
+
+  <div class="symptoms reveal">
+    <div class="symptom"><div class="n">01</div><div class="l">Logo que ninguém <span class="it">lembra</span></div></div>
+    <div class="symptom"><div class="n">02</div><div class="l">Comunicação que <span class="it">varia por canal</span></div></div>
+    <div class="symptom"><div class="n">03</div><div class="l">Site <span class="it">desatualizado</span></div></div>
+    <div class="symptom"><div class="n">04</div><div class="l">Conteúdo <span class="it">inconsistente</span></div></div>
+    <div class="symptom"><div class="n">05</div><div class="l">Time de vendas <span class="it">sem o pitch</span></div></div>
+  </div>
+
+  <div class="b-grid" style="margin-top: 32px;">
+    <div class="b-card acc full reveal">
+      <div class="lbl">O que se aborda</div>
+      <ul class="dots">
+        <li><b>Os 5 sintomas clássicos</b> e por que isso acontece — crescimento orgânico sem estratégia de comunicação</li>
+        <li><b>O custo invisível:</b> clientes que não voltam porque "não lembram de você"; concorrentes menores mas mais visíveis ganham espaço</li>
+        <li>Exemplos reais (anonimizados) de antes e depois</li>
+        <li>A primeira pergunta que toda média empresa precisa responder: <i>"O que você é e por que alguém deveria se importar?"</i></li>
+      </ul>
+    </div>
+
+    <div class="b-card tom full reveal">
+      <div class="lbl">Dinâmica de abertura · 15 min</div>
+      <div class="activity-name">Autodiagnóstico em 5 perguntas</div>
+      <ul class="dots">
+        <li>Você descreve sua marca em uma frase?</li>
+        <li>Seu time comercial fala da empresa do mesmo jeito que você?</li>
+        <li>Seu visual é consistente em todos os canais?</li>
+        <li>Você produz conteúdo com regularidade?</li>
+        <li>Cliente novo entende em 10s o que você faz?</li>
+      </ul>
+      <p style="margin-top: 14px;"><b>3 ou mais "não"?</b> Bem-vindo ao módulo certo. Sem constrangimento — é a maioria das médias empresas do Brasil.</p>
+    </div>
+  </div>
+</section>
+
+<!-- BLOCK 2 -->
+<section class="block" id="b2">
+  <div class="b-num-huge parallax" data-speed="0.05">02</div>
+  <div class="b-head">
+    <div class="b-meta">Bloco<span class="b-num">02</span><span class="b-time">90 min</span></div>
+    <div>
+      <h2 class="reveal">O que é uma <span class="it">área criativa</span> funcional.</h2>
+      <p class="b-desc reveal">Desmistificar design, branding, marketing e produção de conteúdo — e mostrar como cada um se conecta numa operação que gera resultado.</p>
+    </div>
+  </div>
+  <div class="b-grid">
+    <div class="b-card acc full reveal">
+      <div class="lbl">As quatro frentes</div>
+      <ul class="dots">
+        <li><b>Design</b> não é arte — é solução de problema visual. O que um bom designer faz na sua empresa todos os dias</li>
+        <li><b>Branding</b> não é logo — é como a empresa se comporta. Tom de voz, valores, promessa</li>
+        <li><b>Marketing de conteúdo:</b> transformar o que você já sabe em conteúdo que atrai cliente e gera autoridade</li>
+        <li><b>Produção audiovisual:</b> quando vídeo faz sentido, o necessário pra fazer com qualidade, e como escalar</li>
+        <li><b>Como tudo se conversa:</b> o erro clássico é contratar de forma isolada sem direção criativa unificando</li>
+        <li>O papel do <b>diretor de arte / diretor criativo</b> numa operação como a de vocês</li>
+      </ul>
+    </div>
+    <div class="b-card tom reveal">
+      <div class="lbl">Exercício · 20 min</div>
+      <div class="activity-name">Mapeamento da operação atual</div>
+      <p>Cada executivo desenha (no papel) como a comunicação da empresa funciona hoje: quem faz o quê, quem aprova, onde está o gargalo. Compartilha. <b>Você identifica padrões e aponta os pontos cegos mais comuns.</b></p>
+    </div>
+    <div class="b-card reveal">
+      <div class="lbl">Referências</div>
+      <ul class="dots">
+        <li><b>Nubank</b> — branding consistente acelera crescimento</li>
+        <li><b>Stone</b> — vivenciado de dentro</li>
+        <li>Empresa do interior que faz comunicação bem com budget enxuto</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- BLOCK 3 -->
+<section class="block" id="b3">
+  <div class="b-num-huge parallax" data-speed="0.05">03</div>
+  <div class="b-head">
+    <div class="b-meta">Bloco<span class="b-num">03</span><span class="b-time">60 min</span></div>
+    <div>
+      <h2 class="reveal">Time interno <span class="it">vs.</span> hub criativo.</h2>
+      <p class="b-desc reveal">A decisão mais estratégica que um gestor criativo pode tomar. Custo real de cada modelo — sem empurrar solução, com honestidade sobre o que funciona em cada estágio.</p>
+    </div>
+  </div>
+  <div class="b-grid">
+    <div class="b-card acc full reveal">
+      <div class="lbl">A decisão</div>
+      <ul class="dots">
+        <li><b>Custo real do time interno:</b> salário + encargos + ferramentas + tempo de gestão + turnover. Mostre os números com realidade</li>
+        <li><b>Quando faz sentido ter time interno:</b> demanda constante e alta, profundo conhecimento da marca</li>
+        <li><b>Quando faz sentido contratar um hub:</b> demanda variável, fase de crescimento, agilidade e multidisciplinaridade</li>
+        <li><b>O modelo híbrido:</b> gestor criativo interno + hub externo executando — o que mais vejo funcionar</li>
+        <li><b>O modelo MiniLab da Greencave:</b> Start, Pro e Studio — cada tamanho serve um momento</li>
+        <li><b>Hub × agência tradicional:</b> velocidade, flexibilidade, skin in the game</li>
+      </ul>
+    </div>
+    <div class="b-card tom reveal">
+      <div class="lbl">Exercício · 15 min</div>
+      <div class="activity-name">Calculadora de custo ao vivo</div>
+      <p>Planilha simples projetada: salário médio de designer sênior em SP + encargos + ferramentas. Compara com custo de um <b>MiniLab Start</b> por 6 meses. <em>Deixa o número falar — você não precisa vender.</em></p>
+    </div>
+    <div class="b-card amb reveal">
+      <div class="lbl">Os três caminhos</div>
+      <ul class="dots">
+        <li>Time interno · alta demanda</li>
+        <li>Hub criativo · demanda variável</li>
+        <li>Híbrido · gestor + hub executor</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- BLOCK 4 -->
+<section class="block" id="b4">
+  <div class="b-num-huge parallax" data-speed="0.05">04</div>
+  <div class="b-head">
+    <div class="b-meta">Bloco<span class="b-num">04</span><span class="b-time">90 min</span></div>
+    <div>
+      <h2 class="reveal">Briefing <span class="it">e</span> gestão do criativo.</h2>
+      <p class="b-desc reveal">O maior problema entre gestores e criativos não é talento — é comunicação. Como se encomenda errado e como corrigir sem sufocar o processo.</p>
+    </div>
+  </div>
+  <div class="b-grid">
+    <div class="b-card acc full reveal">
+      <div class="lbl">O que se aborda</div>
+      <ul class="dots">
+        <li><b>O brief ruim mais comum:</b> "quero algo moderno, clean e que chame atenção" — e por que gera retrabalho infinito</li>
+        <li><b>Os 6 elementos de um bom brief:</b> objetivo · público · mensagem · tom · referências (com argumento) · prazo realista</li>
+        <li><b>Feedback criativo:</b> a diferença entre "não gostei" e "isso não comunica X porque..."</li>
+        <li><b>Gestão de prazo:</b> "precisa pra ontem" destrói qualidade — como criar cultura de planejamento criativo</li>
+        <li><b>Medir resultado criativo:</b> o objetivo foi atingido? — não é sobre você gostar</li>
+        <li>Brief ruim real anonimizado, e o processo de extrair o que precisava</li>
+      </ul>
+    </div>
+    <div class="b-card tom full reveal">
+      <div class="lbl">Dinâmica · 25 min</div>
+      <div class="activity-name">Reescrevendo o brief</div>
+      <p>Distribua um brief ruim real (anonimizado). Em duplas, eles reescrevem com os 6 elementos. Cada dupla apresenta. <b>A diferença é sempre chocante</b> — e é o aprendizado mais concreto do módulo.</p>
+      <ul class="dots">
+        <li>Material: brief ruim impresso (1 página) + template com 6 campos</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- BLOCK 5 -->
+<section class="block" id="b5">
+  <div class="b-num-huge parallax" data-speed="0.05">05</div>
+  <div class="b-head">
+    <div class="b-meta">Bloco<span class="b-num">05</span><span class="b-time">60 min</span></div>
+    <div>
+      <h2 class="reveal">Greencave como <span class="hl">case aplicado</span><span class="it">.</span></h2>
+      <p class="b-desc reveal">Não é apresentação comercial — é case de gestão criativa. Como estruturei uma operação do zero para clientes de portes diferentes.</p>
+    </div>
+  </div>
+  <div class="b-grid">
+    <div class="b-card acc full reveal">
+      <div class="lbl">Bastidores aplicados</div>
+      <ul class="dots">
+        <li>Como atendemos <b>Stone, Suzano e Aché</b>: o que cada uma precisava, como montamos o time, o que entregamos</li>
+        <li>O que <b>grandes têm em comum com médias do interior</b>: dor de comunicação, falta de direção criativa unificada</li>
+        <li>Como o <b>modelo MiniLab</b> funciona na prática: fluxo, alinhamento, entrega, avaliação semestral</li>
+        <li>O que aprendemos com cada contrato: <em>os erros que viraram processo</em></li>
+        <li>Como aplicar na sua empresa — não precisa ser a Greencave, precisa ser a lógica</li>
+        <li>Abertura natural: <i>"Se quiser entender como isso se aplica ao seu negócio, conversa com a gente depois."</i></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- BLOCK 6 -->
+<section class="block" id="b6">
+  <div class="b-num-huge parallax" data-speed="0.05">06</div>
+  <div class="b-head">
+    <div class="b-meta">Bloco<span class="b-num">06</span><span class="b-time">60 min</span></div>
+    <div>
+      <h2 class="reveal">Posicionamento <span class="it">para médias empresas</span>.</h2>
+      <p class="b-desc reveal">Branding na prática — sem jargão, sem abstração. Como fazer com budget enxuto e sem depender de agência grande.</p>
+    </div>
+  </div>
+  <div class="b-grid">
+    <div class="b-card acc full reveal">
+      <div class="lbl">O que se aborda</div>
+      <ul class="dots">
+        <li><b>Posicionamento:</b> quem você é, pra quem, por que você e não o concorrente — em uma frase que todo mundo da empresa repete</li>
+        <li><b>Tom de voz:</b> como sua empresa escreve, fala e se comporta — branding tanto quanto o logo</li>
+        <li><b>Identidade visual mínima viável:</b> logo, paleta, tipografia, padrão fotográfico — o que precisa antes de produzir conteúdo</li>
+        <li><b>Conteúdo como branding:</b> o que você posta revela quem você é</li>
+        <li><b>Erro mais caro:</b> terceirizar o posicionamento sem o dono da empresa estar envolvido</li>
+        <li><b>Ferramentas acessíveis:</b> Canva Pro + banco de imagem + calendário editorial básico</li>
+      </ul>
+    </div>
+    <div class="b-card tom reveal">
+      <div class="lbl">Exercício · 20 min</div>
+      <div class="activity-name">Frase de Posicionamento</div>
+      <p>Cada um escreve usando o template:</p>
+      <p style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 19px; line-height: 1.4;">"A [empresa] ajuda [público] a [resultado] através de [diferencial]."</p>
+      <p>Apresenta. Você aponta onde está vago, genérico — ou onde tem um <b>diamante escondido</b> que precisa ser lapidado.</p>
+    </div>
+    <div class="b-card amb reveal">
+      <div class="lbl">Pilares do branding mínimo viável</div>
+      <ul class="dots">
+        <li>Posicionamento em uma frase</li>
+        <li>Tom de voz claro</li>
+        <li>Logo, paleta, tipografia</li>
+        <li>Padrão fotográfico</li>
+        <li>Calendário editorial</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- BLOCK 7 -->
+<section class="block" id="b7">
+  <div class="b-num-huge parallax" data-speed="0.05">07</div>
+  <div class="b-head">
+    <div class="b-meta">Bloco<span class="b-num">07</span><span class="b-time">60 min</span></div>
+    <div>
+      <h2 class="reveal">O que eu faço <span class="hl">segunda-feira</span><span class="it">?</span></h2>
+      <p class="b-desc reveal">O bloco de fechamento — transformar 8 horas em ação concreta. Checklist acionável, plano de 90 dias e três decisões para tomar.</p>
+    </div>
+  </div>
+
+  <div class="ninety reveal">
+    <div class="ninety-step">
+      <div class="month">Mês 01</div>
+      <h4>Diagnóstico <span class="it">+</span> decisões</h4>
+      <p>Diagnóstico dos 5 pilares (identidade visual, tom de voz, canais, frequência, time). Decidir time interno × hub × híbrido. Quem lidera. Qual canal priorizar.</p>
+    </div>
+    <div class="ninety-step">
+      <div class="month">Mês 02</div>
+      <h4>Estruturação</h4>
+      <p>Posicionamento em frase. Identidade visual mínima viável. Calendário editorial. Brief padrão dos 6 elementos rodando. Time alocado.</p>
+    </div>
+    <div class="ninety-step">
+      <div class="month">Mês 03</div>
+      <h4>Execução <span class="it">+</span> ajuste</h4>
+      <p>Conteúdo no ar com consistência. Métricas básicas. Primeira retrospectiva. Ajustes finos no fluxo. Sair com hábito instalado.</p>
+    </div>
+  </div>
+
+  <div class="b-grid" style="margin-top: 32px;">
+    <div class="b-card acc full reveal">
+      <div class="lbl">As 3 decisões antes de sair daqui</div>
+      <ul class="dots">
+        <li><b>Modelo:</b> time interno, hub ou híbrido</li>
+        <li><b>Líder:</b> quem responde pela operação criativa</li>
+        <li><b>Canal:</b> qual priorizar — uma comunicação consistente em um canal &gt; presença fragmentada em cinco</li>
+      </ul>
+      <div class="b-quote">Não tente resolver tudo de uma vez. Uma comunicação consistente <em>em um canal</em> vale mais do que presença fragmentada em cinco.</div>
+    </div>
+
+    <div class="b-card tom full reveal">
+      <div class="lbl">Dinâmica final · 20 min</div>
+      <div class="activity-name">Carta para o time</div>
+      <p>Cada executivo escreve (não apresenta — é só pra ele): <i>"O que vou mudar na minha operação criativa nas próximas 2 semanas e quem precisa estar envolvido?"</i> Rodada de abertura: quem quiser compartilha a decisão mais urgente. Você reage com orientação prática — e a conversa com a Greencave fica natural pra quem quiser continuar.</p>
+      <ul class="dots">
+        <li>Checklist impresso dos 5 pilares + plano de 90 dias em branco</li>
+        <li>QR Code com contatos, Greencave + diagnóstico gratuito de 30 min</li>
+        <li>Foto coletiva — conteúdo natural pro LinkedIn do Villa Tech Hub e da Greencave</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- NEXT CTA -->
+<section class="next-cta">
+  <h2 class="reveal">Pronto pra<br><span class="it">segunda-feira</span>?</h2>
+  <div class="btn-row">
+    <a href="#" class="btn">Diagnóstico de 30 min →</a>
+    <a href="modulo-1.html" class="btn outline">Ver Módulo 01 ←</a>
+    <a href="index.html" class="btn outline">Voltar ao hub</a>
+  </div>
+  <p class="small">
+    Diagnóstico gratuito para gestores · Atendimento por demanda<br>
+    Greencave · Itu &amp; região
+  </p>
+</section>
+
+<footer>
+  <span>© 2026 Greencave × Villa Tech Hub</span>
+  <span>Dino Paiva · <a href="mailto:dino@greencave.co">dino@greencave.co</a></span>
+</footer>
+
+<script>
+  const cursor = document.getElementById('cursor');
+  let cx = innerWidth/2, cy = innerHeight/2, tx = cx, ty = cy;
+  addEventListener('mousemove', e => { tx = e.clientX; ty = e.clientY; });
+  (function loop(){ cx += (tx-cx)*.22; cy += (ty-cy)*.22; cursor.style.transform = `translate(${cx}px,${cy}px) translate(-50%,-50%)`; requestAnimationFrame(loop); })();
+  document.querySelectorAll('a, button, .toc-item').forEach(el => { el.addEventListener('mouseenter', () => cursor.classList.add('big')); el.addEventListener('mouseleave', () => cursor.classList.remove('big')); });
+
+  const io = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .14 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  const par = document.querySelectorAll('.parallax');
+  (function ploop(){ const y = scrollY; par.forEach(el => { const s = parseFloat(el.dataset.speed||0.2); el.style.transform = `translate3d(0,${y*s*-1}px,0)`; }); requestAnimationFrame(ploop); })();
+
+  let lastY = 0; const nav = document.getElementById('nav');
+  addEventListener('scroll', () => { const y = scrollY; if (y > 200 && y > lastY) nav.classList.add('hide'); else nav.classList.remove('hide'); lastY = y; });
+</script>
+</body>
+</html>
