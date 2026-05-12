@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Villa Tech Hub — PDF A4 Paisagem</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#f1ece1; --ink:#0d0d0d; --neon:#7dff9c; --amarelo:#f5c842; --tomate:#e8834a;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { background: var(--bg); color: var(--ink); font-family: 'Space Grotesk', sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  /* SCREEN: tile pages */
+  body { padding: 24px; display: flex; flex-direction: column; gap: 24px; align-items: center; }
+
+  .page {
+    width: 297mm;
+    height: 210mm;
+    background: var(--bg);
+    position: relative;
+    overflow: hidden;
+    border: 3px solid var(--ink);
+    padding: 14mm 16mm;
+    display: flex;
+    flex-direction: column;
+  }
+  .page.dark { background: var(--ink); color: var(--bg); }
+  .page.neon { background: var(--neon); }
+
+  .page-head {
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+    padding-bottom: 8px; border-bottom: 2px solid currentColor; margin-bottom: 14px;
+  }
+  .page-head .logo { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 18px; letter-spacing: -.5px; text-transform: none; }
+  .page-head .logo b { font-style: normal; font-family: 'Space Grotesk', sans-serif; font-weight: 700; letter-spacing: -.5px; }
+  .page-foot {
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: 2px solid currentColor;
+    display: flex; justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase;
+  }
+
+  .it { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; }
+  .hl { background: var(--neon); color: var(--ink); padding: 0 .08em; }
+  .hl.behind { background: linear-gradient(to bottom, transparent 0 18%, var(--neon) 18% 88%, transparent 88% 100%); }
+
+  /* COVER */
+  .cover h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 88px;
+    line-height: .85;
+    letter-spacing: -.04em;
+    margin-top: 14px;
+  }
+  .cover .eyebrow {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .cover .eyebrow::before { content: ''; width: 36px; height: 2px; background: var(--ink); }
+  .cover .sub-row {
+    display: grid; grid-template-columns: 1.6fr 1fr; gap: 30px; align-items: end;
+    margin-top: 20px;
+  }
+  .cover .sub-row p { font-size: 14px; line-height: 1.45; max-width: 420px; }
+  .cover .stats { display: grid; grid-template-columns: repeat(4, 1fr); border: 2px solid var(--ink); }
+  .cover .stats div { padding: 10px 10px; border-right: 2px solid var(--ink); }
+  .cover .stats div:last-child { border-right: 0; }
+  .cover .stats b { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 24px; letter-spacing: -.5px; line-height: 1; display: block; }
+  .cover .stats span { font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 1.5px; text-transform: uppercase; opacity: .6; margin-top: 4px; display: block; }
+
+  .cover-art {
+    position: absolute; top: 14mm; right: 16mm; width: 140px; height: 140px; opacity: .9;
+  }
+  .cover-art svg * { fill: none; stroke: var(--ink); stroke-width: 1.5; }
+
+  /* MANIFESTO PAGE */
+  .h2 {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 500;
+    font-size: 38px; line-height: .95; letter-spacing: -.03em;
+    margin-bottom: 14px;
+  }
+  .h2.big { font-size: 60px; }
+  .lead { font-size: 13px; line-height: 1.5; max-width: 720px; opacity: .85; }
+
+  .grid-6 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 2px solid currentColor; border-left: 2px solid currentColor; margin-top: 14px; }
+  .grid-6 .mp { border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; padding: 12px 14px; }
+  .grid-6 .mp .n { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1.5px; opacity: .55; margin-bottom: 6px; display: flex; justify-content: space-between; }
+  .grid-6 .mp h4 { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; font-size: 18px; line-height: 1.05; margin-bottom: 6px; letter-spacing: -.2px; }
+  .grid-6 .mp p { font-size: 11px; line-height: 1.4; opacity: .7; }
+
+  /* MODULE OVERVIEW */
+  .module-row { display: grid; grid-template-columns: 50px 1fr 1fr 80px; align-items: stretch; border: 2px solid var(--ink); margin-bottom: 8px; }
+  .module-row > div { padding: 12px 14px; border-right: 2px solid var(--ink); }
+  .module-row > div:last-child { border-right: 0; }
+  .module-row .mr-num { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 28px; line-height: 1; letter-spacing: -1px; display: flex; align-items: center; }
+  .module-row .mr-meta { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; }
+  .module-row .mr-meta b { display: block; font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 16px; letter-spacing: -.3px; text-transform: none; margin-top: 4px; }
+  .module-row .mr-title { font-family: 'Space Grotesk', sans-serif; font-weight: 500; font-size: 16px; letter-spacing: -.3px; line-height: 1.1; }
+  .module-row .mr-title .it { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; font-size: 17px; }
+  .module-row .mr-arrow { font-size: 28px; display: flex; align-items: center; justify-content: center; }
+
+  /* BLOCK SUMMARIES (for module pages) */
+  .blocks-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 12px; }
+  .blk { border: 2px solid currentColor; padding: 10px 12px; }
+  .blk.acc { background: var(--neon); color: var(--ink); border-color: var(--ink); }
+  .blk.amb { background: var(--amarelo); color: var(--ink); border-color: var(--ink); }
+  .blk.tom { background: var(--tomate); color: var(--ink); border-color: var(--ink); }
+  .blk .b-meta { font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 1.5px; text-transform: uppercase; display: flex; justify-content: space-between; margin-bottom: 4px; opacity: .65; }
+  .blk h3 { font-family: 'Space Grotesk', sans-serif; font-weight: 500; font-size: 17px; letter-spacing: -.4px; line-height: 1.05; margin-bottom: 6px; }
+  .blk h3 .it { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; }
+  .blk p { font-size: 10.5px; line-height: 1.4; opacity: .85; }
+
+  /* NUMBERS */
+  .nums { display: grid; grid-template-columns: repeat(4, 1fr); border: 2px solid currentColor; margin-top: auto; margin-bottom: 16px; }
+  .nums div { padding: 18px 14px; border-right: 2px solid currentColor; }
+  .nums div:last-child { border-right: 0; }
+  .nums b { font-family: 'Space Grotesk', sans-serif; font-weight: 500; font-size: 64px; line-height: .85; letter-spacing: -.04em; display: block; }
+  .nums b .it { font-family: 'Instrument Serif', serif; font-style: italic; color: var(--neon); }
+  .nums span { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; margin-top: 8px; display: block; opacity: .65; }
+
+  /* FACILITATOR */
+  .fac-page { display: grid; grid-template-columns: 1fr 1.4fr; gap: 24px; flex: 1; }
+  .fac-portrait { aspect-ratio: 4/5; border: 2px solid var(--ink); background: var(--neon); position: relative; }
+  .fac-portrait .stripes { position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent 0 14px, rgba(13,13,13,.06) 14px 15px); }
+  .fac-portrait .stamp { position: absolute; top: 12px; left: 12px; background: var(--ink); color: var(--bg); padding: 4px 8px; font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 1.5px; text-transform: uppercase; }
+  .fac-portrait .name-tag { position: absolute; bottom: 12px; left: 12px; right: 12px; background: var(--ink); color: var(--bg); padding: 8px 10px; display: flex; justify-content: space-between; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; }
+  .fac-portrait .name-tag b { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; font-size: 15px; text-transform: none; letter-spacing: 0; }
+  .fac-portrait svg.silhouette { position: absolute; inset: 12% 18% 0 18%; }
+  .fac-portrait svg.silhouette * { fill: none; stroke: var(--ink); stroke-width: 2; stroke-linecap: round; }
+
+  .fac-tracks { border-top: 2px solid var(--ink); margin-top: 16px; }
+  .fac-track { display: grid; grid-template-columns: 70px 1fr auto; gap: 16px; padding: 10px 0; border-bottom: 2px solid var(--ink); align-items: baseline; }
+  .fac-track .y { font-family: 'JetBrains Mono', monospace; font-size: 10px; }
+  .fac-track .p { font-family: 'Space Grotesk', sans-serif; font-weight: 500; font-size: 16px; letter-spacing: -.3px; }
+  .fac-track .p .it { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; }
+  .fac-track .r { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; opacity: .55; }
+
+  .quote { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 16px; line-height: 1.35; padding: 8px 0 8px 14px; border-left: 2px solid var(--ink); margin-top: 14px; }
+
+  /* MODULE COVER */
+  .module-cover h1 {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+    font-size: 76px; line-height: .88; letter-spacing: -.04em;
+    margin-top: 12px;
+  }
+
+  /* PIPELINE */
+  .pipeline { display: grid; grid-template-columns: repeat(6, 1fr); border: 2px solid currentColor; margin-top: 14px; }
+  .pipeline .step { padding: 10px 12px; border-right: 2px solid currentColor; }
+  .pipeline .step:last-child { border-right: 0; }
+  .pipeline .step .n { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1.5px; opacity: .55; }
+  .pipeline .step .l { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 13px; letter-spacing: -.3px; margin-top: 4px; }
+  .pipeline .step .l .it { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; }
+
+  /* 90 DAYS */
+  .ninety { display: grid; grid-template-columns: repeat(3, 1fr); border: 2px solid currentColor; margin-top: 14px; }
+  .ninety .s { padding: 14px; border-right: 2px solid currentColor; }
+  .ninety .s:last-child { border-right: 0; }
+  .ninety .s .month { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; opacity: .55; }
+  .ninety .s h4 { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 22px; letter-spacing: -.4px; margin: 4px 0 8px; }
+  .ninety .s h4 .it { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; }
+  .ninety .s p { font-size: 11px; line-height: 1.4; opacity: .8; }
+
+  /* CTA */
+  .cta-row { display: flex; gap: 10px; margin-top: 14px; }
+  .btn { display: inline-flex; align-items: center; gap: 10px; background: var(--ink); color: var(--bg); padding: 12px 16px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; border: 2px solid var(--ink); }
+  .btn.outline { background: transparent; color: var(--ink); }
+
+  /* MARQUEE-LIKE STRIP */
+  .strip { background: var(--ink); color: var(--bg); padding: 10px 16px; margin: 0 -16mm 14px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 28px; letter-spacing: -.03em; line-height: 1; white-space: nowrap; overflow: hidden; }
+  .strip .it { color: var(--neon); font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; }
+
+  /* Big ghost number for module covers */
+  .ghost-num {
+    position: absolute;
+    bottom: -40px; right: -20px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 380px; line-height: .8; letter-spacing: -.06em;
+    color: rgba(13,13,13,.05);
+    pointer-events: none; user-select: none;
+  }
+  .page.dark .ghost-num { color: rgba(241,236,225,.05); }
+
+  /* PRINT */
+  @media print {
+    @page { size: A4 landscape; margin: 0; }
+    body { padding: 0; gap: 0; display: block; }
+    .page { width: 297mm; height: 210mm; border: none; break-after: page; page-break-after: always; }
+    .page:last-child { break-after: auto; page-break-after: auto; }
+    .toolbar { display: none !important; }
+  }
+
+  .toolbar { position: fixed; top: 12px; right: 12px; z-index: 999; display: flex; gap: 8px; }
+  .toolbar button { background: var(--ink); color: var(--bg); border: none; padding: 10px 14px; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; }
+  .toolbar button:hover { background: var(--neon); color: var(--ink); }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <button onclick="window.print()">Salvar PDF</button>
+</div>
+
+<!-- =================== PAGE 1 — COVER =================== -->
+<section class="page cover">
+  <div class="page-head">
+    <span class="logo"><b>Greencave</b> <i>×</i> Villa Tech</span>
+    <span>Roteiro tático · 2026 · Itu / SP</span>
+  </div>
+
+  <div class="cover-art">
+    <svg viewBox="0 0 200 200">
+      <circle cx="100" cy="100" r="95"/>
+      <circle cx="100" cy="100" r="70"/>
+      <circle cx="100" cy="100" r="45"/>
+      <circle cx="100" cy="100" r="20"/>
+      <line x1="100" y1="0" x2="100" y2="200"/>
+      <line x1="0" y1="100" x2="200" y2="100"/>
+    </svg>
+  </div>
+
+  <div class="eyebrow">VILLA TECH HUB · GREENCAVE · DOIS MÓDULOS · 16H</div>
+
+  <h1>
+    Design <span class="it">com</span> propósito<span class="it">,</span><br>
+    operação <span class="it">com</span> <span class="hl behind">resultado</span>.
+  </h1>
+
+  <div class="sub-row">
+    <p>
+      Dois módulos de oito horas. Um para jovens criativos aprenderem a pensar como direção de arte.
+      Outro para gestores estruturarem uma operação criativa que gera resultado. Sem teoria solta — case real, briefing real, decisão real.
+    </p>
+    <div class="stats">
+      <div><b>02</b><span>Módulos</span></div>
+      <div><b>16h</b><span>Conteúdo</span></div>
+      <div><b>14</b><span>Blocos</span></div>
+      <div><b>15+</b><span>Anos</span></div>
+    </div>
+  </div>
+
+  <div class="page-foot">
+    <span>Dino Paiva · direção criativa</span>
+    <span>01 / 06</span>
+  </div>
+</section>
+
+<!-- =================== PAGE 2 — MANIFESTO =================== -->
+<section class="page">
+  <div class="page-head">
+    <span class="logo"><b>Greencave</b> <i>×</i> Villa Tech</span>
+    <span>Manifesto · 01</span>
+  </div>
+
+  <div class="strip">Pensar <span class="it">·</span> Criar <span class="it">·</span> Posicionar <span class="it">·</span> Operar <span class="it">·</span> Pensar <span class="it">·</span> Criar <span class="it">·</span> Posicionar <span class="it">·</span> Operar</div>
+
+  <h2 class="h2 big">Ensinar design não é só técnica<span class="it">.</span> É <span class="hl behind">modo de pensar</span> — e modo de <span class="it">operar</span>.</h2>
+  <p class="lead" style="margin-top: 8px;">
+    Esse roteiro nasceu de quinze anos atravessando os dois lados do mercado: a redação cheia de prazo, o set de TV, a agência grande, a produtora autoral, e — depois de tudo isso — montar uma operação criativa do zero no interior de São Paulo.
+  </p>
+
+  <div class="grid-6">
+    <div class="mp"><div class="n"><span>01</span><span>↘</span></div><h4>Referência sem argumento é só inspiração.</h4><p>Direção de arte não é Pinterest. É escolha consciente, defendida com palavra.</p></div>
+    <div class="mp"><div class="n"><span>02</span><span>↘</span></div><h4>Briefing ruim não é desculpa.</h4><p>O criativo profissional sabe extrair o que precisa mesmo do brief mais cego.</p></div>
+    <div class="mp"><div class="n"><span>03</span><span>↘</span></div><h4>Branding não é logo. É comportamento.</h4><p>Tom de voz, ritmo de conteúdo, consistência. O logo é a ponta do iceberg.</p></div>
+    <div class="mp"><div class="n"><span>04</span><span>↘</span></div><h4>IA é amplificador. Nunca substituto.</h4><p>Quem tem repertório guia a máquina. Quem não tem, vira commodity.</p></div>
+    <div class="mp"><div class="n"><span>05</span><span>↘</span></div><h4>Média empresa do interior é o motor.</h4><p>Produto bom, comunicação fraca. Aqui é onde direção criativa muda número.</p></div>
+    <div class="mp"><div class="n"><span>06</span><span>↘</span></div><h4>Skin in the game.</h4><p>Não é palestra. É roteiro tático com exercício, brief real, decisão na sala.</p></div>
+  </div>
+
+  <div class="page-foot">
+    <span>Manifesto / 6 princípios</span>
+    <span>02 / 06</span>
+  </div>
+</section>
+
+<!-- =================== PAGE 3 — MODULE OVERVIEW + NUMBERS =================== -->
+<section class="page dark">
+  <div class="page-head">
+    <span class="logo" style="color: var(--bg);"><b>Greencave</b> <i>×</i> Villa Tech</span>
+    <span>Os módulos · 02 · Em números · 03</span>
+  </div>
+
+  <h2 class="h2 big" style="color: var(--bg);">Dois roteiros<span class="it">,</span> duas <span class="it">audiências</span>, uma mesma <span class="it">obsessão</span>.</h2>
+
+  <div style="margin-top: 14px;">
+    <div class="module-row" style="border-color: var(--bg); color: var(--bg);">
+      <div class="mr-num" style="border-color: var(--bg);">01</div>
+      <div class="mr-meta" style="border-color: var(--bg);">JOVENS CRIATIVOS · 8H · 7 BLOCOS<b>Iniciante a intermediário</b></div>
+      <div class="mr-title" style="border-color: var(--bg);">Design <span class="it">com</span> Propósito —<br>da ideia à direção de arte.</div>
+      <div class="mr-arrow" style="color: var(--neon);">→</div>
+    </div>
+    <div class="module-row" style="border-color: var(--bg); color: var(--bg);">
+      <div class="mr-num" style="border-color: var(--bg);">02</div>
+      <div class="mr-meta" style="border-color: var(--bg);">GESTORES · EXECUTIVOS · 8H · 7 BLOCOS<b>Diagnóstico + plano</b></div>
+      <div class="mr-title" style="border-color: var(--bg);">Como estruturar uma <span class="it">operação criativa</span><br>que gera resultado.</div>
+      <div class="mr-arrow" style="color: var(--neon);">→</div>
+    </div>
+  </div>
+
+  <div class="nums" style="border-color: var(--bg); color: var(--bg);">
+    <div style="border-color: var(--bg);"><b><span class="it">~</span>3k</b><span>Serviços entregues<br>pela Greencave</span></div>
+    <div style="border-color: var(--bg);"><b>14</b><span>Blocos práticos<br>com dinâmica + brief</span></div>
+    <div style="border-color: var(--bg);"><b>06</b><span>Princípios fundadores<br>do roteiro</span></div>
+    <div style="border-color: var(--bg);"><b><span class="it">∞</span></b><span>Briefings ruins<br>recebidos até hoje</span></div>
+  </div>
+
+  <div class="page-foot" style="border-color: var(--bg);">
+    <span>Em números</span>
+    <span>03 / 06</span>
+  </div>
+</section>
+
+<!-- =================== PAGE 4 — MÓDULO 01 =================== -->
+<section class="page module-cover" style="position: relative;">
+  <div class="ghost-num">01</div>
+
+  <div class="page-head">
+    <span class="logo"><b>Greencave</b> <i>×</i> Villa Tech</span>
+    <span>Módulo 01 / 02 · Jovens criativos · 8h · 7 blocos</span>
+  </div>
+
+  <div class="eyebrow" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; display: flex; align-items: center; gap: 12px; margin-top: 6px;">
+    <span style="background: var(--ink); color: var(--bg); padding: 4px 10px;">Módulo 01 / 02</span>
+    <span>Jovens criativos · da ideia à direção de arte</span>
+  </div>
+
+  <h1>
+    Design <span class="it">com</span><br>
+    <span class="hl behind">Propósito</span><span class="it">.</span><br>
+    Da <span class="it">ideia</span> à direção de arte.
+  </h1>
+
+  <p class="lead" style="margin-top: 14px; max-width: 540px;">
+    Ensinar design não é só técnica — é <em>modo de pensar</em>. O jovem sai sabendo pensar referência com argumento, conduzir um brief, navegar o mercado e construir portfólio que diz alguma coisa.
+  </p>
+
+  <div class="blocks-grid" style="grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 14px;">
+    <div class="blk acc"><div class="b-meta"><span>Bloco 01</span><span>60 min</span></div><h3>O que é design <span class="it">de verdade</span></h3></div>
+    <div class="blk acc"><div class="b-meta"><span>Bloco 02</span><span>120 min</span></div><h3>Direção de arte <span class="it">na prática</span></h3></div>
+    <div class="blk acc"><div class="b-meta"><span>Bloco 03</span><span>90 min</span></div><h3>Fluxo de um <span class="it">projeto criativo</span></h3></div>
+    <div class="blk acc"><div class="b-meta"><span>Bloco 04</span><span>60 min</span></div><h3>Mercado <span class="it">criativo</span></h3></div>
+    <div class="blk acc"><div class="b-meta"><span>Bloco 05</span><span>60 min</span></div><h3>Greencave <span class="it">case real</span></h3></div>
+    <div class="blk acc"><div class="b-meta"><span>Bloco 06</span><span>30 min</span></div><h3>IA &amp; <span class="it">tecnologia</span></h3></div>
+    <div class="blk acc"><div class="b-meta"><span>Bloco 07</span><span>60 min</span></div><h3>Portfólio <span class="it">e posicionamento</span></h3></div>
+    <div class="blk amb"><div class="b-meta"><span>Pipeline</span><span>06 etapas</span></div><h3>Brief → Pesquisa → Conceito → Apresentação → Revisão → <span class="it">Entrega</span></h3></div>
+  </div>
+
+  <div class="page-foot">
+    <span>Módulo 01 — Jovens criativos</span>
+    <span>04 / 06</span>
+  </div>
+</section>
+
+<!-- =================== PAGE 5 — MÓDULO 02 =================== -->
+<section class="page module-cover dark" style="position: relative;">
+  <div class="ghost-num">02</div>
+
+  <div class="page-head">
+    <span class="logo" style="color: var(--bg);"><b>Greencave</b> <i>×</i> Villa Tech</span>
+    <span>Módulo 02 / 02 · Gestores · 8h · 7 blocos</span>
+  </div>
+
+  <div class="eyebrow" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; display: flex; align-items: center; gap: 12px; margin-top: 6px; color: var(--bg);">
+    <span style="background: var(--neon); color: var(--ink); padding: 4px 10px;">Módulo 02 / 02</span>
+    <span>Gestores · diagnóstico + plano</span>
+  </div>
+
+  <h1 style="font-weight: 500;">
+    Como estruturar uma <span class="it">operação criativa</span> que <span class="hl behind">gera&nbsp;resultado</span>.
+  </h1>
+
+  <p class="lead" style="margin-top: 14px; max-width: 600px; opacity: .85;">
+    A dor das médias empresas do interior é específica: <em>produto bom, comunicação fraca</em>. Esse módulo é diagnóstico, estratégia e plano de ação — com a Greencave como prova viva.
+  </p>
+
+  <div class="blocks-grid" style="grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 14px;">
+    <div class="blk acc"><div class="b-meta"><span>Bloco 01</span><span>60 min</span></div><h3>Por que sua marca <span class="it">está perdida</span></h3></div>
+    <div class="blk acc"><div class="b-meta"><span>Bloco 02</span><span>90 min</span></div><h3>Área criativa <span class="it">funcional</span></h3></div>
+    <div class="blk acc"><div class="b-meta"><span>Bloco 03</span><span>60 min</span></div><h3>Time interno <span class="it">vs.</span> hub</h3></div>
+    <div class="blk acc"><div class="b-meta"><span>Bloco 04</span><span>90 min</span></div><h3>Briefing <span class="it">e gestão</span></h3></div>
+    <div class="blk acc"><div class="b-meta"><span>Bloco 05</span><span>60 min</span></div><h3>Greencave <span class="it">aplicado</span></h3></div>
+    <div class="blk acc"><div class="b-meta"><span>Bloco 06</span><span>60 min</span></div><h3>Posicionamento <span class="it">de marca</span></h3></div>
+    <div class="blk acc"><div class="b-meta"><span>Bloco 07</span><span>60 min</span></div><h3>Segunda<span class="it">-feira</span></h3></div>
+    <div class="blk tom"><div class="b-meta"><span>Plano</span><span>90 dias</span></div><h3>Mês 01 diagnóstico · Mês 02 estrutura · Mês 03 <span class="it">execução</span></h3></div>
+  </div>
+
+  <div class="page-foot" style="border-color: var(--bg);">
+    <span>Módulo 02 — Gestores e executivos</span>
+    <span>05 / 06</span>
+  </div>
+</section>
+
+<!-- =================== PAGE 6 — FACILITADOR + CTA =================== -->
+<section class="page">
+  <div class="page-head">
+    <span class="logo"><b>Greencave</b> <i>×</i> Villa Tech</span>
+    <span>Quem conduz · 04 · Reservar · 05</span>
+  </div>
+
+  <div class="fac-page">
+    <div>
+      <div class="fac-portrait">
+        <div class="stripes"></div>
+        <div class="stamp">facilitador / 01</div>
+        <svg class="silhouette" viewBox="0 0 200 240">
+          <circle cx="100" cy="60" r="38"/>
+          <path d="M30 220 C 30 160, 60 120, 100 120 C 140 120, 170 160, 170 220"/>
+          <line x1="85" y1="92" x2="85" y2="120"/>
+          <line x1="115" y1="92" x2="115" y2="120"/>
+          <circle cx="86" cy="58" r="9"/>
+          <circle cx="114" cy="58" r="9"/>
+          <line x1="95" y1="58" x2="105" y2="58"/>
+          <circle cx="86" cy="58" r="1.5" fill="#0d0d0d"/>
+          <circle cx="114" cy="58" r="1.5" fill="#0d0d0d"/>
+        </svg>
+        <div class="name-tag">
+          <b>Dino Paiva</b>
+          <span>itu / sp</span>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h2 class="h2">Direção criativa <span class="it">vivida</span> — não lida em manual.</h2>
+      <p class="lead" style="margin-top: 4px;">Designer industrial formado em São Paulo, virou diretor de arte atravessando agência, broadcast, produtora, cinema, teatro e digital. Hoje conduz a Greencave, hub criativo nascido da percepção de demanda.</p>
+
+      <div class="quote">"A diferença entre uma produtora comum e a Greencave não é o serviço — é o olhar empreendedor sobre o próprio negócio."</div>
+
+      <div class="fac-tracks">
+        <div class="fac-track"><div class="y">— Hoje</div><div class="p"><span class="it">Greencave</span></div><div class="r">hub / direção criativa</div></div>
+        <div class="fac-track"><div class="y">Antes</div><div class="p">VMLY&amp;R</div><div class="r">agência</div></div>
+        <div class="fac-track"><div class="y">Antes</div><div class="p">Record TV <span class="it">+</span> TV TEM</div><div class="r">broadcast</div></div>
+        <div class="fac-track"><div class="y">Antes</div><div class="p">Disney <span class="it">·</span> Fremantle</div><div class="r">produção / direção</div></div>
+        <div class="fac-track"><div class="y">Origem</div><div class="p">Design <span class="it">Industrial</span></div><div class="r">são paulo</div></div>
+      </div>
+
+      <div class="cta-row">
+        <a class="btn">Reservar lugar →</a>
+        <a class="btn outline">dino@greencave.co</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-foot">
+    <span>© 2026 Greencave · Villa Tech Hub · Itu / SP</span>
+    <span>06 / 06</span>
+  </div>
+</section>
+
+<script>
+(async function autoPrint(){
+  try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch(e){}
+  await new Promise(r => setTimeout(r, 700));
+  window.print();
+})();
+</script>
+
+</body>
+</html>
